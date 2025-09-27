@@ -44,7 +44,8 @@ stage("Push the changed deployment file to Git") {
 
         git config user.name "onurglr"
         git config user.email "onurguler18@gmail.com"
-
+        Write-Host "Git user: $env:GIT_USER"
+        Write-Host "Token length: $($env:GIT_TOKEN.Length)"
         try {
             git checkout -B main origin/main
         } catch {
