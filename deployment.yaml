@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: onur-devops-03-pipeline-cd-onur
-          image: mimaraslan/devops-03-pipeline-aws-onur:1.0.40
+          image: mimaraslan/devops-03-pipeline-aws-onur:1.0.10
           resources:
             limits:
               memory: "256Mi"
