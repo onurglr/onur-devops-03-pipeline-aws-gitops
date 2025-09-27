@@ -47,7 +47,7 @@ stage("Push the changed deployment file to Git") {
 
         # (opsiyonel) detached HEAD durumunda master branch'e geç
         try {
-            git checkout -B master origin/master
+            git checkout -B main origin/main
         } catch {
             Write-Host "Branch checkout skipped or not needed."
         }
