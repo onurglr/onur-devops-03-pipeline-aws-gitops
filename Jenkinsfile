@@ -1,8 +1,5 @@
 pipeline {
-    agent {
-        label 'My-Jenkins-Agent'
-    }
-
+    agent any
     environment {
         APP_NAME = "onur-devops-03-pipeline-aws-gitops"
     }
