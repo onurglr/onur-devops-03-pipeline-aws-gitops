@@ -62,8 +62,10 @@ stage("Push the changed deployment file to Git") {
 
         git commit -m "Updated Deployment Manifest"
 
-        $repoUrl = "https://${env:GIT_USER}:$($env:GIT_TOKEN)@github.com/onurglr/onur-devops-03-pipeline-aws-gitops"
+       $encodedToken = [System.Web.HttpUtility]::UrlEncode($env:GIT_TOKEN)
+        $repoUrl = "https://${env:GIT_USER}:$encodedToken@github.com/onurglr/onur-devops-03-pipeline-aws-gitops.git"
         git push $repoUrl HEAD:main
+
       '''
     }
   }
