@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: onur-devops-03-pipeline-cd-onur-deployment
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: onur-devops-03-pipeline-cd-onur
