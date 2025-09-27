@@ -11,5 +11,5 @@ spec:
   ports:
     - port: 8080        # Cluster içinden erişim için Service portu
       targetPort: 8080  # Pod içindeki container portu
-  type: LoadBalancer      
+  type: NodePort      
 #  type: ClusterIP       # Dışarıya açılmaz, port-forward ile kullanacağız
