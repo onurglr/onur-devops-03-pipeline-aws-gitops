@@ -35,7 +35,7 @@ pipeline {
 stage("Push the changed deployment file to Git") {
   steps {
     withCredentials([usernamePassword(
-      credentialsId: 'github_token',             
+      credentialsId: 'github_token',
       usernameVariable: 'GIT_USER',
       passwordVariable: 'GIT_TOKEN'
     )]) {
@@ -45,7 +45,6 @@ stage("Push the changed deployment file to Git") {
         git config user.name "onurglr"
         git config user.email "onurguler18@gmail.com"
 
-        # (opsiyonel) detached HEAD durumunda master branch'e geç
         try {
             git checkout -B main origin/main
         } catch {
@@ -54,21 +53,21 @@ stage("Push the changed deployment file to Git") {
 
         git add deployment.yaml
 
-        # Staged değişiklik yoksa çık
-        $hasChanges = git diff --cached --quiet; if ($LASTEXITCODE -eq 0) {
+        git diff --cached --quiet
+        if ($LASTEXITCODE -eq 0) {
             Write-Host "No changes to commit."
             exit 0
         }
 
         git commit -m "Updated Deployment Manifest"
 
-        # Token'ı URL’de kullan (PowerShell değişkenleriyle)
-        $repoUrl = "https://${env:GIT_USER}:${env:GIT_TOKEN}@github.com/onurglr/onur-devops-03-pipeline-aws-gitops"
+        $repoUrl = "https://${env:GIT_USER}:$($env:GIT_TOKEN)@github.com/onurglr/onur-devops-03-pipeline-aws-gitops"
         git push $repoUrl HEAD:main
       '''
     }
   }
 }
+
 
              
         
