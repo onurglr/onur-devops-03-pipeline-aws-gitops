@@ -3,12 +3,11 @@ pipeline {
     environment {
         APP_NAME = "devops-03-pipeline-aws-onur"
     }
-
-         stages {
-              stage('Cleanup Workspace') {
+    stages {
+        stage('Cleanup Workspace') {
             steps {
                 script {
-                  cleanWs()
+                    cleanWs()
                 }
             }
         }
@@ -17,63 +16,50 @@ pipeline {
                 checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/onurglr/onur-devops-03-pipeline-aws-gitops']])
             }
         }
-             stage("Update the Deployment Tags") {
-    steps {
-        powershell '''
-           Write-Host "Before update:"
-           Get-Content deployment.yaml
+        stage("Update the Deployment Tags") {
+            steps {
+                sh """
+           echo "Before update:"
+           cat deployment.yaml
 
-           (Get-Content deployment.yaml) `
-             -replace "image: *onurguler18/devops-03-pipeline-aws-onur:.*", "image: onurguler18/devops-03-pipeline-aws-onur:${env:IMAGE_TAG}" `
-             | Set-Content deployment.yaml
+           sed -i "s|\\(image: *onurguler18/devops-03-pipeline-aws-onur:\\).*|\\1${IMAGE_TAG}|" deployment.yaml
 
-           Write-Host "After update:"
-           Get-Content deployment.yaml
-        '''
-    }
-}
-stage("Push the changed deployment file to Git") {
-  steps {
-    withCredentials([usernamePassword(
-      credentialsId: 'github_token',
-      usernameVariable: 'GIT_USER',
-      passwordVariable: 'GIT_TOKEN'
-    )]) {
-      powershell '''
-        $ErrorActionPreference = "Stop"
-
-        git config user.name "onurglr"
-        git config user.email "onur18guler@gmail.com"
-        Write-Host "Pushing as: ${env:GIT_USER}"
-        Write-Host "Git user: $env:GIT_USER"
-        Write-Host "Token length: $($env:GIT_TOKEN.Length)"
-        try {
-            git checkout -B main origin/main
-        } catch {
-            Write-Host "Branch checkout skipped or not needed."
+           echo "After update:"
+           cat deployment.yaml
+        """
+            }
         }
+        stage("Push the changed deployment file to Git") {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'github_token', // Jenkins'teki ID (büyük/küçük harfe dikkat)
+                    usernameVariable: 'GIT_USER',
+                    passwordVariable: 'GIT_TOKEN'
+                )]) {
+                    sh '''#!/usr/bin/env bash
+                set -euo pipefail
 
-        git add deployment.yaml
+                git config user.name  "onurglr"
+                git config user.email "onur18guler@gmail.com"
 
-        git diff --cached --quiet
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "No changes to commit."
-            exit 0
+# (opsiyonel) detached HEAD ise branch'e geç
+                git checkout -B master origin/master || true
+
+                git add deployment.yaml || true
+
+# değişiklik yoksa fail etme
+                if git diff --cached --quiet; then
+                    echo "No changes to commit."
+                exit 0
+                fi
+
+                git commit -m "Updated Deployment Manifest"
+
+# Token'ı URL'de kullan; Jenkins maskeler
+                git push "https://${GIT_USER}:${GIT_TOKEN}github.com/onurglr/onur-devops-03-pipeline-aws-gitops" HEAD:main
+'''
+                }
+            }
         }
-
-        git commit -m "Updated Deployment Manifest"
-
-$encodedToken = [uri]::EscapeDataString($env:GIT_TOKEN) 
-$repoUrl = "https://${env:GIT_USER}:$encodedToken@github.com/onurglr/onur-devops-03-pipeline-aws-gitops.git" 
-git push $repoUrl HEAD:main
-
-      '''
-    }
-  }
-}
-
-
-             
-        
     }
 }
