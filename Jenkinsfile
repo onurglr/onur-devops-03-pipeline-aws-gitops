@@ -65,7 +65,7 @@ stage("Push the changed deployment file to Git") {
 
 $cleanToken = $env:GIT_TOKEN.Trim()
 $repoUrl = "https://${env:GIT_USER}:$cleanToken@github.com/onurglr/onur-devops-03-pipeline-aws-gitops.git"
-        git push $repoUrl HEAD:main
+        git -c credential.helper= push origin main
 
       '''
     }
