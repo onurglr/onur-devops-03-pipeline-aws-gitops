@@ -44,6 +44,7 @@ stage("Push the changed deployment file to Git") {
 
         git config user.name "onurglr"
         git config user.email "onurguler18@gmail.com"
+        Write-Host "Pushing as: ${env:GIT_USER}"
         Write-Host "Git user: $env:GIT_USER"
         Write-Host "Token length: $($env:GIT_TOKEN.Length)"
         try {
@@ -62,8 +63,7 @@ stage("Push the changed deployment file to Git") {
 
         git commit -m "Updated Deployment Manifest"
 
-       $encodedToken = [uri]::EscapeDataString($env:GIT_TOKEN)
-        $repoUrl = "https://${env:GIT_USER}:$encodedToken@github.com/onurglr/onur-devops-03-pipeline-aws-gitops.git"
+       $repoUrl = "https://${env:GIT_USER}:${env:GIT_TOKEN}@github.com/onurglr/onur-devops-03-pipeline-aws-gitops.git"
         git push $repoUrl HEAD:main
 
       '''
